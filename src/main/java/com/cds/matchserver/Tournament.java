@@ -18,17 +18,34 @@ public class Tournament {
     private final List<Player> pot;
     private final String name;
     private final List<List<Fixture>> rounds;
+    private int currentRound = 0;
 
-    public Tournament(List<Player> tournamentPot, String _name) {
+    public Tournament(List<Player> tournamentPot,
+            String _name) {
         name = _name;
         pot = new ArrayList<>(tournamentPot);
         Collections.shuffle(pot);   // randomise
         rounds = generateFixtures();
+        addPlayersToFirstRoundFixtures();
+
+    }
+
+    public Fixture findPlayer(Player p) {
+
+        List<Fixture> firstRound = rounds.get(0);
+        Fixture fixture = null;
+
+        for (Fixture f : firstRound) {
+            if (f.player1.equals(p) || f.player2.equals(p)) {
+                fixture = f;
+            }
+        }
+        return fixture;
     }
 
     /**
      *
-     * @return 
+     * @return
      */
     final protected List<List<Fixture>> generateFixtures() {
 
@@ -58,7 +75,8 @@ public class Tournament {
      * @param matchNo
      * @return
      */
-    protected final List<Fixture> getNextRoundFixtures(List<Fixture> fixtures, Integer matchNo) {
+    protected final List<Fixture> getNextRoundFixtures(List<Fixture> fixtures,
+            Integer matchNo) {
 
         Fixture previous1 = null, next = null;
 
@@ -68,7 +86,10 @@ public class Tournament {
                 previous1 = fixture;
             }
             else {
-                Fixture nextRoundFixture = new Fixture(matchNo++, previous1, fixture, next);
+                Fixture nextRoundFixture = new Fixture(matchNo++,
+                        previous1,
+                        fixture,
+                        next);
                 previous1.next = nextRoundFixture;
                 fixture.next = nextRoundFixture;
                 nextRoundFixtures.add(nextRoundFixture);
@@ -82,26 +103,49 @@ public class Tournament {
      *
      * @return
      */
-    Player playTournament() {
+    Player playWholeTournament() {
 
         System.out.println("\n\n\n______________________________________");
         System.out.println("Welcome to " + name + ", " + pot.size());
         System.out.println("______________________________________\n");
 
-        addPlayersToFirstRoundFixtures();
-
         Player roundWinner = null;
         for (List<Fixture> round : rounds) {
-            System.out.println("\n\n\n*******Playing round " + rounds.indexOf(round));
-            roundWinner = playRound(round, rounds.indexOf(round) + 1);
+            System.out.println("\n\n\n*******Playing round " + (rounds.indexOf(round) + 1));
+            roundWinner = playRound(round,
+                    rounds.indexOf(round) + 1);
         }
         return roundWinner;
     }
 
     /**
      *
+     * @return
      */
-     private void addPlayersToFirstRoundFixtures() {
+    Player playTournamentByRound() {
+
+        if (currentRound >= rounds.size()) {
+            return null;    //horrible
+        }
+
+        List<Fixture> round = rounds.get(currentRound);
+
+        System.out.println("\n\n\n______________________________________");
+        System.out.println("Welcome to round " + (currentRound + 1) + " of the " + name + ", " + round.size());
+        System.out.println("______________________________________\n");
+
+        Player roundWinner = playRound(round,
+                rounds.indexOf(round) + 1);
+
+        currentRound++;
+
+        return roundWinner;
+    }
+
+    /**
+     *
+     */
+    private void addPlayersToFirstRoundFixtures() {
         List<Fixture> firstRound = rounds.get(0);
         int playerNo = 0;
 
@@ -117,7 +161,8 @@ public class Tournament {
      * @param roundNo
      * @return
      */
-    private Player playRound(List<Fixture> roundFixtures, int roundNo) {
+    private Player playRound(List<Fixture> roundFixtures,
+            int roundNo) {
 
         int atpPoints = 25; //(round * round) * 25; TODO!!!!!!!!!
         Player roundWinner = null;
@@ -130,7 +175,11 @@ public class Tournament {
         }
 
         for (Fixture f : roundFixtures) {
-            Match match = new Match(f.player1, f.player2, 5, name + " " + roundDescription(roundFixtures.size()), roundNo);
+            Match match = new Match(f.player1,
+                    f.player2,
+                    5,
+                    name + " at round " + roundNo,
+                    roundNo);
             roundWinner = match.playMatch();
             if (f.next != null) {
                 if (f.next.player1 == null) {

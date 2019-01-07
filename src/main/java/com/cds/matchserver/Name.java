@@ -14,30 +14,76 @@ import java.util.List;
  */
 public class Name {
 
-    static String generate() {
+    public static String generatePlayerName() {
 
         Dice d1 = new Dice(firstNames.size());
         Dice d2 = new Dice(secondNames.size());
+        Dice d3 = new Dice(nationsNames.size());
 
-        return firstNames.get(d1.roll() - 1) + " " + secondNames.get(d2.roll() - 1);
-
-    }
-
-    static List<String> firstNames = Arrays.asList("Jed", "Alistair", "Johnathan", "Pascal", "Simon", "Chris", "Rafael", "Deitmar", "Pablo", "Rich", "Randy", "Steve", "Doug", "Lucas", "Dave", "Gareth", "Fred", "Ian", "Ken", "Kevin", "Alan", "Tim", "Roger", "James", "Eddie", "Leon", "Leo", "John", "Ethan", "Aiden", "Oscar", "Alex", "Paul", "Chris", "Oliver");
-
-    static String generateTournamentName() {
-
-        Dice d1 = new Dice(firstTNames.size());
-        Dice d2 = new Dice(secondTNames.size());
-
-        return firstTNames.get(d1.roll() - 1) + " " + secondTNames.get(d2.roll() - 1);
+         return firstNames.get(d1.roll() - 1) + " " + secondNames.get(d2.roll() - 1) + "[" + nationsNames.get(d3.roll() - 1) + "]";
 
     }
 
-    static List<String> firstTNames = Arrays.asList("The British", "Flushing", "Paris", "Sydney", "The American", "The European");
-    static List<String> secondTNames = Arrays.asList("Meadows", "Open", "Grand Slam", "Market", "Masters", "Indoor", "Championship");
+    private final static List<String> nationsNames = Arrays.asList("UK",
+            "USA",
+            "Austria",
+            "Germany",
+            "Australia",
+            "Spain",
+            "Canada",
+            "South Africa",
+            "Netherlands",
+            "Denmark",
+            "Norway",
+            "Sweden",
+            "Poland",
+            "France"
+    );
 
-    static List<String> secondNames = Arrays.asList(
+    private final static List<String> firstNames = Arrays.asList("Jed",
+            "Alistair",
+            "Johnathan",
+            "Ollie",
+            "Raffa",
+            "Kriss",
+            "Henrich",
+            "Pascal",
+            "Simon",
+            "Chris",
+            "Rafael",
+            "Deitmar",
+            "Pablo",
+            "Rich",
+            "Randy",
+            "Steve",
+            "Doug",
+            "Lucas",
+            "Dave",
+            "Gareth",
+            "Fred",
+            "Ian",
+            "Ken",
+            "Kevin",
+            "Alan",
+            "Tim",
+            "Roger",
+            "James",
+            "Eddie",
+            "Leon",
+            "Leo",
+            "John",
+            "Johnas",
+            "Jonah",
+            "Ethan",
+            "Aiden",
+            "Oscar",
+            "Alex",
+            "Paul",
+            "Paulo",
+            "Christian",
+            "Hans");
+
+    private final static List<String> secondNames = Arrays.asList(
             "Smith",
             "Randall",
             "Truman",
@@ -207,5 +253,29 @@ public class Name {
             "Poole",
             "Atkinson",
             "Lawson");
+
+    public static String generateTournamentName() {
+
+        Dice d1 = new Dice(firstTNames.size());
+        Dice d2 = new Dice(secondTNames.size());
+
+        return firstTNames.get(d1.roll() - 1) + " " + secondTNames.get(d2.roll() - 1);
+
+    }
+
+    private final static List<String> firstTNames = Arrays.asList("The British",
+            "Flushing",
+            "Paris",
+            "Sydney",
+            "The American",
+            "The European");
+
+    private final static List<String> secondTNames = Arrays.asList("Meadows",
+            "Open",
+            "Grand Slam",
+            "Market",
+            "Masters",
+            "Indoor",
+            "Championship");
 
 }

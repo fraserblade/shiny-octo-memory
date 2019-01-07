@@ -20,7 +20,7 @@ public class Player implements Comparable<Player> {
 
     @Override
     public String toString() {
-        return "Player{" + "rank=" + rank + "\tstrength=" + strength + ", speed=" + speed + ", forehand=" + forehand + ", backhand=" + backhand + ", serve=" + serve + ", combined=" + combined + ", combinedAdjustedForAge=" + combinedAdjustedForAge + ", name=" + name + ", atpPoints=" + atpPoints + ", age=" + age + '}';
+        return "Player{" + "rank=" + rank + "\tstrength=" + strength + ", speed=" + speed + ", forehand=" + forehand + ", backhand=" + backhand + ", serve=" + serve + ", peakCombined=" + peakCombined + ", combinedAdjustedForAge=" + combinedAdjustedForAge + ", name=" + name + ", atpPoints=" + atpPoints + ", age=" + age + '}';
     }
 
     private final int strength;
@@ -28,7 +28,7 @@ public class Player implements Comparable<Player> {
     private final int forehand;
     private final int backhand;
     private final int serve;
-    private final int combined;
+    private final int peakCombined;
     private int combinedAdjustedForAge;
     private final String name;
 
@@ -61,18 +61,18 @@ public class Player implements Comparable<Player> {
         forehand = gauss100();// dice.roll();
         backhand = gauss100();// dice.roll();
         serve = gauss100();// dice.roll();
-        name = Name.generate();
+        name = Name.generatePlayerName();
 
-        combined = strength + speed + forehand + backhand + serve;
+        peakCombined = strength + speed + forehand + backhand + serve;
         results = new ArrayList<>();
 
         age = 17 + dice.roll() / 5;
 
         int yearsoffPeak = Math.abs(PEAK_AGE - age);
 
-        combinedAdjustedForAge = combined - (yearsoffPeak * yearsoffPeak);
+        combinedAdjustedForAge = peakCombined - (yearsoffPeak * yearsoffPeak);
 
-        System.out.println(this);
+        //System.out.println(this);
 
     }
     
@@ -91,7 +91,7 @@ public class Player implements Comparable<Player> {
         int peak = PEAK_AGE;
         int yearsoffPeak = Math.abs(peak - age);
 
-        combinedAdjustedForAge = combined - (yearsoffPeak * yearsoffPeak);
+        combinedAdjustedForAge = peakCombined - (yearsoffPeak * yearsoffPeak);
     }
 
     final int gauss100() {
@@ -118,5 +118,9 @@ public class Player implements Comparable<Player> {
                 System.out.println("Lose " + res);
             }
         }
+    }
+
+    void improve(int improvement) {
+        combinedAdjustedForAge += improvement;
     }
 }
