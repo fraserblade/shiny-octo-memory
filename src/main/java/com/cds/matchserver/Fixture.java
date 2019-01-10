@@ -14,7 +14,8 @@ public class Fixture {
     int i;
     Fixture previous1;
     Fixture previous2;
-    Fixture next;
+    Fixture nextFixture;
+    int round;
     Player player1;
     Player player2;
 
@@ -24,7 +25,7 @@ public class Fixture {
 
     @Override
     public String toString() {
-        return "Fixture{" + "i=" + i + ", previous1=" + previous1 + ", previous2=" + previous2 + ", next=" + (next != null ? next.i : "not set") +'}';
+        return "Fixture{" + "i=" + i + ", previous1=" + previous1 + ", previous2=" + previous2 + ", next=" + (nextFixture != null ? nextFixture.i : "not set") +'}';
     }
 
 
@@ -32,7 +33,7 @@ public class Fixture {
         this.i = i;
         this.previous1 = previous1;
         this.previous2 = previous2;
-        this.next = next;
+        this.nextFixture = next;
     }
 
 }

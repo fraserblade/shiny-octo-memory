@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 public class Main {
 
     private static final int TOURNAMENTS = 10;
-    private static final int WORLD_PLAYERS = 200;
+    private static final int WORLD_PLAYERS = 32
+            ;    // TODO: Leaves empty Fixtures!!
 
     /**
      * @param args the command line arguments
@@ -34,8 +35,7 @@ public class Main {
             worldPlayerPot.add(new Player());
         }
 
-        List<Player> sList = worldPlayerPot.stream().sorted(Comparator.comparing(Player::getCombined).reversed()).collect(
-                Collectors.toList());
+        List<Player> sList = worldPlayerPot.stream().sorted(Comparator.comparing(Player::getCombined).reversed()).collect(Collectors.toList());
         int j = 1;
         for (Player p : sList) {
             p.rank = j++;
@@ -43,25 +43,20 @@ public class Main {
 
         Dice dAllPlayers = new Dice(worldPlayerPot.size());
 
-        Player yourPlayer = worldPlayerPot.get(dAllPlayers.roll());
+        Player yourPlayer = worldPlayerPot.get(dAllPlayers.roll() - 1);
 
-        for (int k = 0; k < 10; k++) {
+        for (int year = 0; year < 4; year++) {
 
-            System.out.println("Your player is " + yourPlayer.toString());
+            print("Your player is " + yourPlayer);
 
             System.in.read();
-
-            List<Tournament> tournaments = new ArrayList<>();
 
             Tournament tournament;
 
             for (int i = 0; i < 4; i++) {
-                tournament = new Tournament(worldPlayerPot,
-                        Name.generateTournamentName() + " " + (2019 + k));
-
+                tournament = new Tournament(worldPlayerPot, Name.generateTournamentName() + " " + (2019 + year));
                 Fixture f = tournament.findPlayer(yourPlayer);
-
-                p(" s(he) is playing in " + f + " " + f.player1.getNameAndRank() + " " + f.player2.getNameAndRank());
+                print("s(he) is playing in " + f + " " + f.player1.getNameAndRank() + " vs " + f.player2.getNameAndRank());
 
                 Player winner;
                 do {
@@ -70,27 +65,29 @@ public class Main {
                 while (winner != null);
 
                 yourPlayer.showResults();
-
-                
             }
+
+            int rank = 0;
 
             Collections.sort(worldPlayerPot);
 
-                System.out.println("Final ATP positions ");
-                int pos = 1;
-                for (Player p : worldPlayerPot) {
-                    String msg = pos + ".\t" + p.getNameAndRank() + "\t\t\t" + p.atpPoints;
-                    if(p.equals(yourPlayer)) {
-                        msg += "**************";
-                    }
-                    System.out.println(msg);
-                    p.setAge(p.getAge() + 1);
-                    p.atpPoints = 0;    //   reset
-                    pos++;
+            print("Final ATP positions ");
+            int pos = 1;
+            for (Player p : worldPlayerPot) {
+                String msg = pos + ".\t" + p.getNameAndRank() + "\t\t\t" + p.atpPoints;
+                if (p.equals(yourPlayer)) {
+                    msg += "**************";
+                    rank = pos;
                 }
-                
+                print(msg);
+                p.setAge(p.getAge() + 1);
+                p.atpPoints = 0;    //   reset
+                pos++;
+            }
+
+            System.out.println("Rank " + (2019 + year) + ": " + rank);
             int improvement = new Dice(20).roll();
-            p("Increasing stats by " + improvement);
+            print("Increasing stats by " + improvement);
             yourPlayer.improve(improvement);
         }
     }
@@ -115,7 +112,7 @@ public class Main {
             for (Iterator<Player> iterator = playerPot.iterator(); iterator.hasNext();) {
                 Player p = iterator.next();
                 if (p.getAge() - d6.roll() > 35) {
-                    System.out.println(p.getName() + " retires ");
+                    print(p.getName() + " retires ");
                     iterator.remove();
                 }
             }
@@ -123,7 +120,7 @@ public class Main {
             System.out.println("Final ATP positions " + year);
             int pos = 1;
             for (Player p : playerPot) {
-                System.out.println(pos + ".\t" + p.getNameAndRank() + "\t\t\t" + p.atpPoints);
+                print(pos + ".\t" + p.getNameAndRank() + "\t\t\t" + p.atpPoints);
                 p.setAge(p.getAge() + 1);
                 pos++;
             }
@@ -143,7 +140,7 @@ public class Main {
         System.out.println("HIGHEST " + hiRanking);
     }
 
-    static void p(String s) {
+    static void print(String s) {
         System.out.println(s);
     }
 }

@@ -19,21 +19,19 @@ public class Match {
 
     @Override
     public String toString() {
-        return "Match " + matchNo + " {" + "competition=" + competition + ", p1=" + p1.getNameAndRank() + ", p2=" + p2.getNameAndRank() + ", setsToWin=" + setsToWin + ", p2Dice=" + p2Dice + ", p1Dice=" + p1Dice + ", setsP2=" + setsP2 + ", setsP1=" + setsP1 + '}';
+        return "Match " + " {" + "competition=" + competition + ", p1=" + p1.getNameAndRank() + ", p2=" + p2.getNameAndRank() + ", setsToWin=" + setsToWin + ", p2Dice=" + p2Dice + ", p1Dice=" + p1Dice + ", setsP2=" + setsP2 + ", setsP1=" + setsP1 + '}';
     }
 
     private final String competition;
-    private final int matchNo;
 
-    public Match(Player _p1, Player _p2, int _numSets, String _competitionName, int _matchNo) {
+    public Match(Player _p1, Player _p2, int _numSets, String _competitionName) {
         p1 = _p1;
         p2 = _p2;
         competition = _competitionName;
-        matchNo = _matchNo;
         p1Dice = new Dice(p1.getCombined());
         p2Dice = new Dice(p2.getCombined());
         setsToWin = (_numSets / 2) + 1;
-        System.out.println("It's " + p1.getName() + " and " + p2.getName() + " taking to the court...");
+        System.out.println("\nIt's " + p1.getName() + " and " + p2.getName() + " taking to the court...");
         if (p1.rank > p2.rank + 20) {
             //System.out.println("This should be an easy game for " + p2.getName());
         }
@@ -77,16 +75,16 @@ public class Match {
                     gamesP2++;
                 }
                 if (!silent) {
-                    _sleep(1);
+                   // _sleep(1);
                 }
             }
             String setMsg = getMessageForCommentary();
 
             if (gamesP1 > gamesP2) {
-                System.out.println(p1.getName() + " takes the " + setMsg + " set " + gamesP1 + ":" + gamesP2);
+                System.out.print(p1.getName() + " takes the " + setMsg + " set " + gamesP1 + ":" + gamesP2 + ", ");
                 setsP1++;
             } else {
-                System.out.println(p2.getName() + " takes the " + setMsg + " set " + gamesP2 + ":" + gamesP1);
+                System.out.print(p2.getName() + " takes the " + setMsg + " set " + gamesP2 + ":" + gamesP1 + ", ");
                 setsP2++;
             }
             sets.add(new SetScore(gamesP1, gamesP2));
@@ -102,7 +100,7 @@ public class Match {
         if (!silent) {
             System.out.println(res);
         }
-        System.out.println(res.winner.getNameAndRank() + " wins");
+        System.out.println("\n" + res.winner.getNameAndRank() + " wins");
         return res.winner;
     }
 

@@ -15,88 +15,41 @@ import java.util.List;
  */
 public class Tournament {
 
+    FixtureTree fixtureTree;
     private final List<Player> pot;
     private final String name;
-    private final List<List<Fixture>> rounds;
-    private int currentRound = 0;
+    private int currentRound = 1;
+    private Player me;
 
-    public Tournament(List<Player> tournamentPot,
-            String _name) {
+    public Tournament(List<Player> tournamentPot, String _name) {
         name = _name;
         pot = new ArrayList<>(tournamentPot);
         Collections.shuffle(pot);   // randomise
-        rounds = generateFixtures();
-        addPlayersToFirstRoundFixtures();
 
+        fixtureTree = new FixtureTree(tournamentPot);
+        fixtureTree.populate(null);
+        fixtureTree.addPlayersToTournament();
     }
 
+
+    /**
+     * 
+     * @param p
+     * @return 
+     */
     public Fixture findPlayer(Player p) {
 
-        List<Fixture> firstRound = rounds.get(0);
+        List<Fixture> firstRound = fixtureTree.fixturesMappedByRound.get(1);
         Fixture fixture = null;
 
         for (Fixture f : firstRound) {
             if (f.player1.equals(p) || f.player2.equals(p)) {
                 fixture = f;
+                break;
             }
         }
+        me = p;
         return fixture;
-    }
-
-    /**
-     *
-     * @return
-     */
-    final protected List<List<Fixture>> generateFixtures() {
-
-        List<List<Fixture>> r = new ArrayList<>();
-        List<Fixture> fixtures = new ArrayList<>();
-
-        Integer matchNo;
-
-        for (matchNo = 1; matchNo <= pot.size() / 2; matchNo++) {
-            fixtures.add(new Fixture(matchNo));
-        }
-
-        r.add(fixtures);
-
-        while (fixtures.size() > 1) {
-            fixtures = getNextRoundFixtures(fixtures, matchNo);
-            r.add(fixtures);
-            matchNo += fixtures.size();
-        }
-
-        return r;
-    }
-
-    /**
-     *
-     * @param fixtures
-     * @param matchNo
-     * @return
-     */
-    protected final List<Fixture> getNextRoundFixtures(List<Fixture> fixtures,
-            Integer matchNo) {
-
-        Fixture previous1 = null, next = null;
-
-        List<Fixture> nextRoundFixtures = new ArrayList<>();
-        for (Fixture fixture : fixtures) {
-            if (previous1 == null) {
-                previous1 = fixture;
-            }
-            else {
-                Fixture nextRoundFixture = new Fixture(matchNo++,
-                        previous1,
-                        fixture,
-                        next);
-                previous1.next = nextRoundFixture;
-                fixture.next = nextRoundFixture;
-                nextRoundFixtures.add(nextRoundFixture);
-                previous1 = null;
-            }
-        }
-        return nextRoundFixtures;
     }
 
     /**
@@ -110,10 +63,10 @@ public class Tournament {
         System.out.println("______________________________________\n");
 
         Player roundWinner = null;
-        for (List<Fixture> round : rounds) {
-            System.out.println("\n\n\n*******Playing round " + (rounds.indexOf(round) + 1));
-            roundWinner = playRound(round,
-                    rounds.indexOf(round) + 1);
+        for (List<Fixture> round : fixtureTree.fixturesMappedByRound.values()) {
+            System.out.println("\n\n*******Playing round " + round);
+            roundWinner = playRound(round);
+            currentRound++;
         }
         return roundWinner;
     }
@@ -124,35 +77,23 @@ public class Tournament {
      */
     Player playTournamentByRound() {
 
-        if (currentRound >= rounds.size()) {
-            return null;    //horrible
+        Player roundWinner = null;
+        List<Fixture> round = fixtureTree.fixturesMappedByRound.get(currentRound);
+
+        if(round != null) {
+            System.out.println("\n\n\n______________________________________");
+            System.out.println("Welcome to " + roundDescription(currentRound) + " of the " + name + ", " + fixtureTree.fixturesMappedByRound.size());
+            System.out.println("______________________________________\n");
+
+            for (Fixture f : round) {
+                System.out.println("Match " + f.i + " : " + f.player1.getNameAndRank() + " vs " + f.player2.getNameAndRank());
+            }
+
+             roundWinner = playRound(round);
+
+            currentRound++;
         }
-
-        List<Fixture> round = rounds.get(currentRound);
-
-        System.out.println("\n\n\n______________________________________");
-        System.out.println("Welcome to round " + (currentRound + 1) + " of the " + name + ", " + round.size());
-        System.out.println("______________________________________\n");
-
-        Player roundWinner = playRound(round,
-                rounds.indexOf(round) + 1);
-
-        currentRound++;
-
         return roundWinner;
-    }
-
-    /**
-     *
-     */
-    private void addPlayersToFirstRoundFixtures() {
-        List<Fixture> firstRound = rounds.get(0);
-        int playerNo = 0;
-
-        for (Fixture f : firstRound) {
-            f.player1 = pot.get(playerNo++);
-            f.player2 = pot.get(playerNo++);
-        }
     }
 
     /**
@@ -161,54 +102,73 @@ public class Tournament {
      * @param roundNo
      * @return
      */
-    private Player playRound(List<Fixture> roundFixtures,
-            int roundNo) {
+    private Player playRound(List<Fixture> roundFixtures) {
 
         int atpPoints = 25; //(round * round) * 25; TODO!!!!!!!!!
         Player roundWinner = null;
 
-        //System.out.println(name + ": Playing " + roundDescription());
-        //System.out.println("Adding " + atpPoints + " ATP points for the " + playersInRound.size() + " players in round");
         for (Fixture f : roundFixtures) {
             f.player1.atpPoints += atpPoints;
             f.player2.atpPoints += atpPoints;
         }
 
         for (Fixture f : roundFixtures) {
-            Match match = new Match(f.player1,
-                    f.player2,
-                    5,
-                    name + " at round " + roundNo,
-                    roundNo);
-            roundWinner = match.playMatch();
-            if (f.next != null) {
-                if (f.next.player1 == null) {
-                    f.next.player1 = roundWinner;
-                }
-                else {
-                    f.next.player2 = roundWinner;
-                }
-            }
+            Match match = new Match(f.player1, f.player2, 5, getMatchDescription());
+            boolean silencePlayer = !f.player1.equals(me) && !f.player2.equals(me);
+            
+            roundWinner = match.playMatch(silencePlayer);
+            addWinnerToNextFixture(f, roundWinner);
         }
         return roundWinner;
     }
 
-    private String roundDescription(int roundNo) {
-        String desc = "Round x";
+    /**
+     * 
+     * @param f
+     * @param roundWinner 
+     */
+    private void addWinnerToNextFixture(Fixture f, Player roundWinner) {
+        if (f.nextFixture != null) {
+            if (f.nextFixture.player1 == null) {
+                f.nextFixture.player1 = roundWinner;
+            }
+            else {
+                f.nextFixture.player2 = roundWinner;
+            }
+        }
+        else {
+            System.out.println("Tournament ends");
+        }
+    }
 
-        if (roundNo == 1) {
+    /**
+     * 
+     * @return 
+     */
+    private String getMatchDescription() {
+        return name + " at " + roundDescription(currentRound) + " of " + fixtureTree.fixturesMappedByRound.size();
+    }
+
+    /**
+     * 
+     * @param roundNo
+     * @return 
+     */
+    private String roundDescription(int roundNo) {
+        String desc = "Round " + roundNo;
+
+        if (roundNo == fixtureTree.fixturesMappedByRound.size()) {
             desc = "Final";
         }
-        if (roundNo == 2) {
+        if (roundNo == fixtureTree.fixturesMappedByRound.size() - 1) {
             desc = "Semi-final";
         }
-        if (roundNo == 4) {
+        if (roundNo == fixtureTree.fixturesMappedByRound.size() - 2) {
             desc = "Quarter-final";
         }
-        if (roundNo == 8) {
+        if (roundNo == fixtureTree.fixturesMappedByRound.size() - 3) {
             desc = "Round of 16";
         }
-
         return desc;
     }
 }

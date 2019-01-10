@@ -66,7 +66,7 @@ public class Player implements Comparable<Player> {
         peakCombined = strength + speed + forehand + backhand + serve;
         results = new ArrayList<>();
 
-        age = 17 + dice.roll() / 5;
+        age = 15 + dice.roll() / 4;
 
         int yearsoffPeak = Math.abs(PEAK_AGE - age);
 
